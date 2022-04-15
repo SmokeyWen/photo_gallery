@@ -53,13 +53,13 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> photos = new ArrayList<String>();
         File[] fList = file.listFiles();
 //null in fList
-        Log.i("findPhotos", fList.toString());
+//        Log.i("findPhotos", fList.toString());
         if (fList != null) {
             Log.i("findPhotos", "in if");
             for (File f : fList) {
                 Log.i("findPhotos", f.toString());
                 Log.i("findPhotos", f.getPath());
-                if (((startTimestamp == null && endTimestamp == null) || (f.lastModified() >= startTimestamp.getTime() && f.lastModified() <= endTimestamp.getTime())) && (keywords == "" || f.getPath().contains(keywords))) {
+                if (((startTimestamp == null && endTimestamp == null) || (f.lastModified() >= startTimestamp.getTime() && f.lastModified() <= endTimestamp.getTime())) && (keywords == "" || keywords == null || f.getPath().contains(keywords))) {
                     photos.add(f.getPath());
                     Log.i("findPhotos", "for loop if");
                 }
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                     endTimestamp = null;
                 }
                 String keywords = (String) data.getStringExtra("KEYWORDS");
-                Log.i("tag", keywords);
+//                Log.i("tag", keywords);
                 index = 0;
                 photos = findPhotos(startTimestamp, endTimestamp, keywords);
                 if (photos.size() == 0) {
