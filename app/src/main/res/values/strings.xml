@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">photo_gallery</string>
+    <string name="right_btn">Right</string>
+    <string name="left_btn">Left</string>
+    <string name="search_btn">Search</string>
+    <string name="snap_btn">Snap</string>
+    <string name="search_field">Search</string>
+    <string name="timestamp_field">Timestamp</string>
+</resources>
