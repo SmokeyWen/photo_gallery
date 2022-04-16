@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("findPhotos", f.getPath());
                 if (((startTimestamp == null && endTimestamp == null) || (f.lastModified() >= startTimestamp.getTime() && f.lastModified() <= endTimestamp.getTime())) && (keywords == "" || f.getPath().contains(keywords))) {
                     photos.add(f.getPath());
+                    Log.i("photo-timestamp", new Date(f.lastModified()).toString());
                     Log.i("findPhotos", "for loop if");
                 }
             }
@@ -100,16 +101,22 @@ public class MainActivity extends AppCompatActivity {
             tv.setText("");
         } else {
             iv.setImageBitmap(BitmapFactory.decodeFile(path));
-            String[] attr = path.split("_");
+//            String[] attr = path.split("_");
+            String[] attr = path.split("#");
+            String timeStamp = attr[2].split("\\.")[0];
+//            Log.i("REALTIMESTAMP", otherAttr[1].split("\\.")[0]);
+            for (int i = 0; i < attr.length; i++)
+                Log.i("attr " + i, attr[i]);
+//            Log.i("attrs", attr);
             et.setText(attr[1]);
-            tv.setText(attr[2]);
+            tv.setText(timeStamp);
         }
     }
     private File createImageFile() throws IOException {
         Log.i("createImageFile", "102");
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "_caption_" + timeStamp + "_";
+        String imageFileName = "#caption#" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg",storageDir);
         mCurrentPhotoPath = image.getAbsolutePath();
@@ -153,11 +160,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updatePhoto(String path, String caption) {
-        String[] attr = path.split("_");
+        String[] attr = path.split("#");
         if (attr.length >= 3) {
-            File to = new File(attr[0] + "_" + caption + "_" + attr[2] + "_" + attr[3]);
+            Log.i("new pathname:", attr[0] + "#" + caption + "#" + attr[2]);
+            File to = new File(attr[0] + "#" + caption + "#" + attr[2]);
             File from = new File(path);
             from.renameTo(to);
+            photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), ""); // update photo list with new names.
         }
     }
 }
