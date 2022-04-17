@@ -32,6 +32,7 @@ public class EspressoTest {
         onView(withId(R.id.SearchActivity)).check(matches(isDisplayed()));
     }
 
+    
     @Test
     public void selectADateRange() {
         String fromTimeStamp = "2022-04-17 14:00:00";
