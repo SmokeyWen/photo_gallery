@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat; import java.util.ArrayList;
 import java.util.Date;
 public class MainActivity extends AppCompatActivity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_IMAGE_FILTER = 2;
     String mCurrentPhotoPath;
     private ArrayList<String> photos = null;
     private int index = 0;
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private ArrayList<String> findPhotos(Date startTimestamp, Date endTimestamp, String keywords) {
+//        Log.i("startDateFilter", startTimestamp == null ? "" : startTimestamp.toString());
+//        Log.i("endDateFilter", endTimestamp == null ? "" : endTimestamp.toString());
         Log.i("findPhotos", "49");
         Log.i("findPhotos", Environment.getExternalStorageDirectory().toString());
         File file = new File(Environment.getExternalStorageDirectory()
@@ -57,10 +60,15 @@ public class MainActivity extends AppCompatActivity {
         if (fList != null) {
             Log.i("findPhotos", "in if");
             for (File f : fList) {
-                Log.i("findPhotos", f.toString());
-                Log.i("findPhotos", f.getPath());
+//                Log.i("findPhotos", f.toString());
+//                Log.i("findPhotos", f.getPath());
+                Log.i("startDateFilter", startTimestamp == null ? "" : startTimestamp.toString());
+                Log.i("endDateFilter", endTimestamp == null ? "" : endTimestamp.toString());
                 if (((startTimestamp == null && endTimestamp == null) || (f.lastModified() >= startTimestamp.getTime() && f.lastModified() <= endTimestamp.getTime())) && (keywords == "" || keywords == null || f.getPath().contains(keywords))) {
+//                    Log.i("startDateFilter", startTimestamp == null ? "" : startTimestamp.toString());
+//                    Log.i("endDateFilter", endTimestamp == null ? "" : endTimestamp.toString());
                     photos.add(f.getPath());
+                    Log.i("photo-path", f.getPath());
                     Log.i("photo-timestamp", new Date(f.lastModified()).toString());
                     Log.i("findPhotos", "for loop if");
                 }
@@ -128,13 +136,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i("onActivityResult", "115");
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
+        if (requestCode == REQUEST_IMAGE_FILTER) {
             if (resultCode == RESULT_OK) {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
                 Date startTimestamp , endTimestamp;
                 try {
                     String from = (String) data.getStringExtra("STARTTIMESTAMP");
                     String to = (String) data.getStringExtra("ENDTIMESTAMP");
+//                    Log.i("from", from);
+//                    Log.i("to", to);
                     startTimestamp = format.parse(from);
                     endTimestamp = format.parse(to);
                 } catch (Exception ex) {
@@ -142,8 +152,12 @@ public class MainActivity extends AppCompatActivity {
                     endTimestamp = null;
                 }
                 String keywords = (String) data.getStringExtra("KEYWORDS");
-//                Log.i("tag", keywords);
+                Log.i("intent", String.valueOf(data));
+                Log.i("tag", keywords);
+                Log.i("from", startTimestamp.toString());
+                Log.i("to", endTimestamp.toString());
                 index = 0;
+                Log.i("finding photos", "...");
                 photos = findPhotos(startTimestamp, endTimestamp, keywords);
                 if (photos.size() == 0) {
                     displayPhoto(null);
@@ -153,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Log.i("is this getting called?", "...");
             ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
             mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
             photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), "");
@@ -172,6 +187,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void goSearch(View view) {
         Intent intent = new Intent(this, SearchActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_IMAGE_FILTER);
     }
 }
