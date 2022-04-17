@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".SearchActivity"
     android:id="@+id/SearchActivity">
-
     <TextView
         android:id="@+id/tvFromDateTime"  android:text="From: "
         android:layout_width="wrap_content" android:layout_height="wrap_content"

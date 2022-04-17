@@ -169,4 +169,9 @@ public class MainActivity extends AppCompatActivity {
             photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), ""); // update photo list with new names.
         }
     }
+
+    public void goSearch(View view) {
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivity(intent);
+    }
 }
