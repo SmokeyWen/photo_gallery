@@ -182,8 +182,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("finding photos", "...");
                 photos = findPhotos();
                 if (photos.size() == 0) {
+                    Log.i("photo", "not found");
                     displayPhoto(null);
                 } else {
+                    Log.i("photo", "found photo");
                     displayPhoto(photos.get(index));
                 }
             }

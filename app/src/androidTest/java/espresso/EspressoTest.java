@@ -10,9 +10,6 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.Espresso.onView;
 import com.example.photo_gallery.R;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import android.view.View;
-
-import android.widget.TextView;
 
 import androidx.test.espresso.Espresso;
 
@@ -37,9 +34,9 @@ public class EspressoTest {
 
     @Test
     public void selectADateRange() {
-        String fromTimeStamp = "2022-04-16 15:40:49";
-        String toTimeStamp = "2022-04-16 15:40:51";
-        String correctTimeStamp = "2022-04-16 15:40:50";
+        String fromTimeStamp = "2022-04-17 14:00:00";
+        String toTimeStamp = "2022-04-17 15:00:00";
+        String correctTimeStamp = "20220417_145230";
 
 //      Go to search screen
         onView(withText("search")).perform(click());
@@ -59,5 +56,54 @@ public class EspressoTest {
 
 //      Check the timstamp on main screen has the correct timestamp
         onView(withId(R.id.tvTimestamp)).check(matches(withText(correctTimeStamp)));
+    }
+
+    @Test
+    public void searchWithGivenCaption(){
+//      Go to search screen
+        onView(withText("search")).perform(click());
+        onView(withId(R.id.SearchActivity)).check(matches(isDisplayed()));
+
+        //Searching the Caption
+        onView(withId(R.id.etKeywords)).perform(typeText("TEST"));
+        Espresso.closeSoftKeyboard();
+
+        //Clicking on search
+        onView(withId(R.id.go)).perform(click());
+        onView(withId(R.id.MainActivity)).check(matches(isDisplayed()));
+
+        //Matches with Caption
+        onView(withId(R.id.etCaption)).check(matches(withSubstring("TEST")));
+    }
+
+    @Test
+    public void selectADateRangeAndCaption() {
+        String fromTimeStamp = "2022-04-16 15:00:00";
+        String toTimeStamp = "2022-04-16 16:00:00";
+        String correctTimeStamp = "20220416_151718";
+
+//      Go to search screen
+        onView(withText("search")).perform(click());
+        onView(withId(R.id.SearchActivity)).check(matches(isDisplayed()));
+
+//      Enter the desired timestamp and verify
+        onView(withId(R.id.etFromDateTime)).perform(click()).perform(replaceText(fromTimeStamp));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etFromDateTime)).check(matches(withText(fromTimeStamp)));
+        onView(withId(R.id.etToDateTime)).perform(click()).perform(replaceText(toTimeStamp));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.etToDateTime)).check(matches(withText(toTimeStamp)));
+
+//      Searching the Caption
+        onView(withId(R.id.etKeywords)).perform(typeText("TEST"));
+        Espresso.closeSoftKeyboard();
+
+//      Go back to the main screen and verify
+        onView(withId(R.id.go)).perform(click());
+        onView(withId(R.id.MainActivity)).check(matches(isDisplayed()));
+
+//      Check the timestamp on main screen has the correct timestamp
+        onView(withId(R.id.tvTimestamp)).check(matches(withText(correctTimeStamp)));
+        onView(withId(R.id.etCaption)).check(matches(withSubstring("TEST")));
     }
 }
