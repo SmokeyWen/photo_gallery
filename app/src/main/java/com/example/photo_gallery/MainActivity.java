@@ -62,14 +62,15 @@ public class MainActivity extends AppCompatActivity {
             for (File f : fList) {
 //                Log.i("findPhotos", f.toString());
 //                Log.i("findPhotos", f.getPath());
-                Log.i("startDateFilter", startTimestamp == null ? "" : startTimestamp.toString());
-                Log.i("endDateFilter", endTimestamp == null ? "" : endTimestamp.toString());
+//                Log.i("startDateFilter", startTimestamp == null ? "" : startTimestamp.toString());
+//                Log.i("endDateFilter", endTimestamp == null ? "" : endTimestamp.toString());
                 if (((startTimestamp == null && endTimestamp == null) || (f.lastModified() >= startTimestamp.getTime() && f.lastModified() <= endTimestamp.getTime())) && (keywords == "" || keywords == null || f.getPath().contains(keywords))) {
 //                    Log.i("startDateFilter", startTimestamp == null ? "" : startTimestamp.toString());
 //                    Log.i("endDateFilter", endTimestamp == null ? "" : endTimestamp.toString());
                     photos.add(f.getPath());
-                    Log.i("photo-path", f.getPath());
-                    Log.i("photo-timestamp", new Date(f.lastModified()).toString());
+                    Log.i("keywords", keywords);
+//                    Log.i("photo-path", f.getPath());
+//                    Log.i("photo-timestamp", new Date(f.lastModified()).toString());
                     Log.i("findPhotos", "for loop if");
                 }
             }
@@ -80,7 +81,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void scrollPhotos(View v) {
         Log.i("scrollPhotos", "66");
-        updatePhoto(photos.get(index), ((EditText) findViewById(R.id.etCaption)).getText().toString());
+        Log.i("index?", Integer.toString(index));
+
+        try {
+            updatePhoto(photos.get(index), ((EditText) findViewById(R.id.etCaption)).getText().toString());
+        } catch (IndexOutOfBoundsException e) {
+            Log.i("empty photos global", "...");
+            return;
+        }
 
         switch (v.getId()) {
             case R.id.btnPrev:
