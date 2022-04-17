@@ -16,12 +16,19 @@ public class MainActivity extends AppCompatActivity {
     String mCurrentPhotoPath;
     private ArrayList<String> photos = null;
     private int index = 0;
+    private Date filterStartTimestamp = null;
+    private Date filterEndTimestamp = null;
+    private String filterCaption = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), "");
+//        photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), "");
+        filterStartTimestamp = new Date(Long.MIN_VALUE);
+        filterEndTimestamp = new Date();
+        filterCaption = "";
+        photos = findPhotos();
         if (photos.size() == 0) {
             displayPhoto(null);
         } else {
@@ -46,9 +53,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    private ArrayList<String> findPhotos(Date startTimestamp, Date endTimestamp, String keywords) {
-//        Log.i("startDateFilter", startTimestamp == null ? "" : startTimestamp.toString());
-//        Log.i("endDateFilter", endTimestamp == null ? "" : endTimestamp.toString());
+//    private ArrayList<String> findPhotos(Date filterStartTimestamp, Date filterEndTimestamp, String keywords) {
+    private ArrayList<String> findPhotos() {
+//        Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
+//        Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
         Log.i("findPhotos", "49");
         Log.i("findPhotos", Environment.getExternalStorageDirectory().toString());
         File file = new File(Environment.getExternalStorageDirectory()
@@ -62,13 +70,13 @@ public class MainActivity extends AppCompatActivity {
             for (File f : fList) {
 //                Log.i("findPhotos", f.toString());
 //                Log.i("findPhotos", f.getPath());
-//                Log.i("startDateFilter", startTimestamp == null ? "" : startTimestamp.toString());
-//                Log.i("endDateFilter", endTimestamp == null ? "" : endTimestamp.toString());
-                if (((startTimestamp == null && endTimestamp == null) || (f.lastModified() >= startTimestamp.getTime() && f.lastModified() <= endTimestamp.getTime())) && (keywords == "" || keywords == null || f.getPath().contains(keywords))) {
-//                    Log.i("startDateFilter", startTimestamp == null ? "" : startTimestamp.toString());
-//                    Log.i("endDateFilter", endTimestamp == null ? "" : endTimestamp.toString());
+//                Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
+//                Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
+                if (((filterStartTimestamp == null && filterEndTimestamp == null) || (f.lastModified() >= filterStartTimestamp.getTime() && f.lastModified() <= filterEndTimestamp.getTime())) && (filterCaption == "" || filterCaption == null || f.getPath().contains(filterCaption))) {
+//                    Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
+//                    Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
                     photos.add(f.getPath());
-                    Log.i("keywords", keywords);
+                    Log.i("keywords", filterCaption);
 //                    Log.i("photo-path", f.getPath());
 //                    Log.i("photo-timestamp", new Date(f.lastModified()).toString());
                     Log.i("findPhotos", "for loop if");
@@ -81,10 +89,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void scrollPhotos(View v) {
         Log.i("scrollPhotos", "66");
-        Log.i("index?", Integer.toString(index));
-
         try {
             updatePhoto(photos.get(index), ((EditText) findViewById(R.id.etCaption)).getText().toString());
+            if (index > (photos.size() - 1)) // with an active caption filter, changing the last image's caption
+                index = photos.size() - 1;   // causes errors. this will rectify it.
+            if (photos.size() == 0) { // if we remove the only image that existed, we ought to
+                displayPhoto(""); // display nothing.
+                return;
+            }
         } catch (IndexOutOfBoundsException e) {
             Log.i("empty photos global", "...");
             return;
@@ -98,12 +110,13 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btnNext:
                 if (index < (photos.size() - 1)) {
-                index++;
-            }
-            break;
+                    index++;
+                }
+                break;
             default:
                 break;
         }
+
         displayPhoto(photos.get(index));
     }
     private void displayPhoto(String path) {
@@ -147,26 +160,27 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_FILTER) {
             if (resultCode == RESULT_OK) {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
-                Date startTimestamp , endTimestamp;
+//                Date filterStartTimestamp , filterEndTimestamp;
                 try {
-                    String from = (String) data.getStringExtra("STARTTIMESTAMP");
-                    String to = (String) data.getStringExtra("ENDTIMESTAMP");
+                    String from = (String) data.getStringExtra("filterStartTimestamp");
+                    String to = (String) data.getStringExtra("filterEndTimestamp");
 //                    Log.i("from", from);
 //                    Log.i("to", to);
-                    startTimestamp = format.parse(from);
-                    endTimestamp = format.parse(to);
+                    filterStartTimestamp = format.parse(from);
+                    filterEndTimestamp = format.parse(to);
                 } catch (Exception ex) {
-                    startTimestamp = null;
-                    endTimestamp = null;
+                    Log.i("Exception?", ex.toString());
+                    filterStartTimestamp = null;
+                    filterEndTimestamp = null;
                 }
-                String keywords = (String) data.getStringExtra("KEYWORDS");
+                filterCaption = (String) data.getStringExtra("KEYWORDS");
                 Log.i("intent", String.valueOf(data));
-                Log.i("tag", keywords);
-                Log.i("from", startTimestamp.toString());
-                Log.i("to", endTimestamp.toString());
+                Log.i("tag", filterCaption);
+//                Log.i("from", filterStartTimestamp.toString());
+//                Log.i("to", filterEndTimestamp.toString());
                 index = 0;
                 Log.i("finding photos", "...");
-                photos = findPhotos(startTimestamp, endTimestamp, keywords);
+                photos = findPhotos();
                 if (photos.size() == 0) {
                     displayPhoto(null);
                 } else {
@@ -178,7 +192,10 @@ public class MainActivity extends AppCompatActivity {
             Log.i("is this getting called?", "...");
             ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
             mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
-            photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), "");
+            filterStartTimestamp = new Date(Long.MIN_VALUE);
+            filterEndTimestamp = new Date();
+            filterCaption = "";
+            photos = findPhotos();
         }
     }
 
@@ -189,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
             File to = new File(attr[0] + "#" + caption + "#" + attr[2]);
             File from = new File(path);
             from.renameTo(to);
-            photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), ""); // update photo list with new names.
+            photos = findPhotos(); // update photo list with new names.
         }
     }
 
