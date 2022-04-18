@@ -35,9 +35,9 @@ public class EspressoTest {
     
     @Test
     public void selectADateRange() {
-        String fromTimeStamp = "2022-04-17 14:00:00";
-        String toTimeStamp = "2022-04-17 15:00:00";
-        String correctTimeStamp = "20220417_145230";
+        String fromTimeStamp = "2022-04-15 14:00:00";
+        String toTimeStamp = "2022-04-16 20:00:00";
+        String correctTimeStamp = "20220416_200137_4659152328269910865";
 
 //      Go to search screen
         onView(withText("search")).perform(click());
@@ -79,9 +79,9 @@ public class EspressoTest {
 
     @Test
     public void selectADateRangeAndCaption() {
-        String fromTimeStamp = "2022-04-16 15:00:00";
-        String toTimeStamp = "2022-04-16 16:00:00";
-        String correctTimeStamp = "20220416_151718";
+        String fromTimeStamp = "2022-04-15 14:00:00";
+        String toTimeStamp = "2022-04-16 20:00:00";
+        String correctTimeStamp = "20220415_200105_4048891414302013295";
 
 //      Go to search screen
         onView(withText("search")).perform(click());
