@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
     }
 //    private ArrayList<String> findPhotos(Date filterStartTimestamp, Date filterEndTimestamp, String keywords) {
     private ArrayList<String> findPhotos() {
-//        Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
-//        Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
+        Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
+        Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
         Log.i("findPhotos", "49");
         Log.i("findPhotos", Environment.getExternalStorageDirectory().toString());
         File file = new File(Environment.getExternalStorageDirectory()
@@ -73,12 +73,12 @@ public class MainActivity extends AppCompatActivity {
 //                Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
 //                Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
                 if (((filterStartTimestamp == null && filterEndTimestamp == null) || (f.lastModified() >= filterStartTimestamp.getTime() && f.lastModified() <= filterEndTimestamp.getTime())) && (filterCaption == "" || filterCaption == null || f.getPath().contains(filterCaption))) {
-//                    Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
-//                    Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
+                    Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
+                    Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
                     photos.add(f.getPath());
                     Log.i("keywords", filterCaption);
 //                    Log.i("photo-path", f.getPath());
-//                    Log.i("photo-timestamp", new Date(f.lastModified()).toString());
+                    Log.i("photo-timestamp", new Date(f.lastModified()).toString());
                     Log.i("findPhotos", "for loop if");
                 }
             }
