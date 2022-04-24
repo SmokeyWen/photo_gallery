@@ -1,12 +1,16 @@
 package com.example.photo_gallery;
 import androidx.appcompat.app.AppCompatActivity; import androidx.core.content.FileProvider;
-import android.content.Intent; import android.graphics.BitmapFactory;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri; import android.os.Bundle; import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View; import android.widget.EditText;
 import android.widget.ImageView; import android.widget.TextView; import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat; import java.util.ArrayList;
 import java.util.Date;
@@ -14,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_FILTER = 2;
     String mCurrentPhotoPath;
+    Bitmap mBitMap;
     private ArrayList<String> photos = null;
     private int index = 0;
     private Date filterStartTimestamp = null;
@@ -130,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
             tv.setText("");
         } else {
             iv.setImageBitmap(BitmapFactory.decodeFile(path));
+            mBitMap = BitmapFactory.decodeFile(path);
 //            String[] attr = path.split("_");
             String[] attr = path.split("#");
             String timeStamp = attr[2].split("\\.")[0];
@@ -215,5 +221,25 @@ public class MainActivity extends AppCompatActivity {
     public void goSearch(View view) {
         Intent intent = new Intent(this, SearchActivity.class);
         startActivityForResult(intent, REQUEST_IMAGE_FILTER);
+    }
+
+    public void goShare(View view) {
+        photos = findPhotos();
+        if (photos.size() == 0) {
+            Log.i("Error", "No photos");
+        } else {
+            sharePicturesIntent(1, mBitMap);
+        }
+    }
+
+    private void sharePicturesIntent(Integer request_code, Bitmap bit) {
+        String filePath = MediaStore.Images.Media.insertImage(getContentResolver(), bit, "Image to Share", null);
+        Uri uri = Uri.parse(filePath);
+
+        Intent sendPhotoIntent = new Intent(Intent.ACTION_SEND);
+        sendPhotoIntent.setType("image/jpg");
+        sendPhotoIntent.putExtra(Intent.EXTRA_STREAM, uri);
+
+        startActivity(sendPhotoIntent.createChooser(sendPhotoIntent, "Share Photo"));
     }
 }
