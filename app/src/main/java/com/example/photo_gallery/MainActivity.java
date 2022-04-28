@@ -1,10 +1,13 @@
 package com.example.photo_gallery;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity; import androidx.core.content.FileProvider;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.net.Uri; import android.os.Bundle; import android.os.Environment;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle; import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View; import android.widget.EditText;
@@ -14,6 +17,10 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat; import java.util.ArrayList;
 import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_FILTER = 2;
@@ -25,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private Date filterEndTimestamp = null;
     private String filterCaption = null;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 //    private ArrayList<String> findPhotos(Date filterStartTimestamp, Date filterEndTimestamp, String keywords) {
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private ArrayList<String> findPhotos() {
         Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
         Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
@@ -68,27 +77,12 @@ public class MainActivity extends AppCompatActivity {
                 .getAbsolutePath(), "/Android/data/com.example.photo_gallery/files/Pictures");
         ArrayList<String> photos = new ArrayList<String>();
         File[] fList = file.listFiles();
-//null in fList
-//        Log.i("findPhotos", fList.toString());
+
         if (fList != null) {
-            Log.i("findPhotos", "in if");
-            for (File f : fList) {
-//                Log.i("findPhotos", f.toString());
-//                Log.i("findPhotos", f.getPath());
-//                Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
-//                Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
-                if (((filterStartTimestamp == null && filterEndTimestamp == null) || (f.lastModified() >= filterStartTimestamp.getTime() && f.lastModified() <= filterEndTimestamp.getTime())) && (filterCaption == "" || filterCaption == null || f.getPath().contains(filterCaption))) {
-                    Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
-                    Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
-                    photos.add(f.getPath());
-                    Log.i("keywords", filterCaption);
-//                    Log.i("photo-path", f.getPath());
-                    Log.i("photo-timestamp", new Date(f.lastModified()).toString());
-                    Log.i("findPhotos", "for loop if");
-                }
-            }
+            Stream<File> fileStream = Arrays.stream(fList);
+            Stream<File> findFileStream = fileStream.filter(f -> ((filterStartTimestamp == null && filterEndTimestamp == null) || (f.lastModified() >= filterStartTimestamp.getTime() && f.lastModified() <= filterEndTimestamp.getTime())) && (filterCaption == "" || filterCaption == null || f.getPath().contains(filterCaption)));
+            findFileStream.forEach(f -> photos.add(f.getPath()));
         }
-        Log.i("findPhotos", "61");
         return photos;
     }
 
@@ -159,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
         return image;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i("onActivityResult", "115");
@@ -207,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void updatePhoto(String path, String caption) {
         String[] attr = path.split("#");
         if (attr.length >= 3) {
@@ -223,6 +219,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_IMAGE_FILTER);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void goShare(View view) {
         photos = findPhotos();
         if (photos.size() == 0) {
@@ -237,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
         Uri uri = Uri.parse(filePath);
 
         Intent sendPhotoIntent = new Intent(Intent.ACTION_SEND);
+        sendPhotoIntent.setAction(Intent.ACTION_GET_CONTENT);
         sendPhotoIntent.setType("image/jpg");
         sendPhotoIntent.putExtra(Intent.EXTRA_STREAM, uri);
 
