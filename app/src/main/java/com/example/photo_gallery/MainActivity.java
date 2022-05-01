@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), "");
         filterStartTimestamp = new Date(Long.MIN_VALUE);
         filterEndTimestamp = new Date();
         filterCaption = "";
@@ -48,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
             displayPhoto(photos.get(index));
         }
     }
+
     public void takePhoto(View v) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -62,17 +62,12 @@ public class MainActivity extends AppCompatActivity {
                 Uri photoURI = FileProvider.getUriForFile(this, "com.example.photo_gallery.fileprovider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                Log.i("photo", "44");
             }
         }
     }
-//    private ArrayList<String> findPhotos(Date filterStartTimestamp, Date filterEndTimestamp, String keywords) {
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     private ArrayList<String> findPhotos() {
-        Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
-        Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
-        Log.i("findPhotos", "49");
-        Log.i("findPhotos", Environment.getExternalStorageDirectory().toString());
         File file = new File(Environment.getExternalStorageDirectory()
                 .getAbsolutePath(), "/Android/data/com.example.photo_gallery/files/Pictures");
         ArrayList<String> photos = new ArrayList<String>();
@@ -86,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
         return photos;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void scrollPhotos(View v) {
-        Log.i("scrollPhotos", "66");
         try {
             updatePhoto(photos.get(index), ((EditText) findViewById(R.id.etCaption)).getText().toString());
             if (index > (photos.size() - 1)) // with an active caption filter, changing the last image's caption
@@ -97,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         } catch (IndexOutOfBoundsException e) {
-            Log.i("empty photos global", "...");
             return;
         }
 
@@ -119,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
         displayPhoto(photos.get(index));
     }
     private void displayPhoto(String path) {
-        Log.i("displayPhoto", "86");
         ImageView iv = (ImageView) findViewById(R.id.ivGallery);
         TextView tv = (TextView) findViewById(R.id.tvTimestamp);
         EditText et = (EditText) findViewById(R.id.etCaption);
@@ -130,69 +123,50 @@ public class MainActivity extends AppCompatActivity {
         } else {
             iv.setImageBitmap(BitmapFactory.decodeFile(path));
             mBitMap = BitmapFactory.decodeFile(path);
-//            String[] attr = path.split("_");
             String[] attr = path.split("#");
             String timeStamp = attr[2].split("\\.")[0];
-//            Log.i("REALTIMESTAMP", otherAttr[1].split("\\.")[0]);
             for (int i = 0; i < attr.length; i++)
-                Log.i("attr " + i, attr[i]);
-//            Log.i("attrs", attr);
             et.setText(attr[1]);
             tv.setText(timeStamp);
         }
     }
     private File createImageFile() throws IOException {
-        Log.i("createImageFile", "102");
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "#caption#" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg",storageDir);
         mCurrentPhotoPath = image.getAbsolutePath();
-        Log.i("photo", mCurrentPhotoPath);
         return image;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i("onActivityResult", "115");
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_FILTER) {
             if (resultCode == RESULT_OK) {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
-//                Date filterStartTimestamp , filterEndTimestamp;
                 try {
                     String from = (String) data.getStringExtra("filterStartTimestamp");
                     String to = (String) data.getStringExtra("filterEndTimestamp");
-//                    Log.i("from", from);
-//                    Log.i("to", to);
                     filterStartTimestamp = format.parse(from);
                     filterEndTimestamp = format.parse(to);
                 } catch (Exception ex) {
-                    Log.i("Exception?", ex.toString());
                     filterStartTimestamp = null;
                     filterEndTimestamp = null;
                 }
                 filterCaption = (String) data.getStringExtra("KEYWORDS");
-                Log.i("intent", String.valueOf(data));
-                Log.i("tag", filterCaption);
-//                Log.i("from", filterStartTimestamp.toString());
-//                Log.i("to", filterEndTimestamp.toString());
                 index = 0;
-                Log.i("finding photos", "...");
                 photos = findPhotos();
                 if (photos.size() == 0) {
-                    Log.i("photo", "not found");
                     displayPhoto(null);
                 } else {
-                    Log.i("photo", "found photo");
                     displayPhoto(photos.get(index));
                 }
             }
         }
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Log.i("is this getting called?", "...");
             ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
             mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
             filterStartTimestamp = new Date(Long.MIN_VALUE);
@@ -206,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
     private void updatePhoto(String path, String caption) {
         String[] attr = path.split("#");
         if (attr.length >= 3) {
-            Log.i("new pathname:", attr[0] + "#" + caption + "#" + attr[2]);
             File to = new File(attr[0] + "#" + caption + "#" + attr[2]);
             File from = new File(path);
             from.renameTo(to);
@@ -223,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
     public void goShare(View view) {
         photos = findPhotos();
         if (photos.size() == 0) {
-            Log.i("Error", "No photos");
         } else {
             sharePicturesIntent(1, mBitMap);
         }
