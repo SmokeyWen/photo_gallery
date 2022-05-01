@@ -11,11 +11,13 @@ import android.os.Bundle; import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View; import android.widget.EditText;
-import android.widget.ImageView; import android.widget.TextView; import java.io.File;
+import android.widget.ImageView; import android.widget.TextView;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat; import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -112,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         displayPhoto(photos.get(index));
     }
+
     private void displayPhoto(String path) {
         ImageView iv = (ImageView) findViewById(R.id.ivGallery);
         TextView tv = (TextView) findViewById(R.id.tvTimestamp);
@@ -130,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
             tv.setText(timeStamp);
         }
     }
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
