@@ -1,10 +1,13 @@
 package com.example.photo_gallery;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity; import androidx.core.content.FileProvider;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.net.Uri; import android.os.Bundle; import android.os.Environment;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle; import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View; import android.widget.EditText;
@@ -14,6 +17,10 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat; import java.util.ArrayList;
 import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_FILTER = 2;
@@ -24,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     Filter defaultFilter = null;
     Filter newFilter = null;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
             displayPhoto(photos.get(index));
         }
     }
+
     public void takePhoto(View v) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -54,11 +63,11 @@ public class MainActivity extends AppCompatActivity {
                 Uri photoURI = FileProvider.getUriForFile(this, "com.example.photo_gallery.fileprovider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                Log.i("photo", "44");
             }
         }
     }
-//    private ArrayList<String> findPhotos(Date filterStartTimestamp, Date filterEndTimestamp, String keywords) {
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private ArrayList<String> findPhotos() {
         Log.i("startDateFilter", defaultFilter.getFilterStartTimeStamp() == null ? "" : defaultFilter.getFilterStartTimeStamp().toString());
         Log.i("endDateFilter", defaultFilter.getFilterEndTimeStamp() == null ? "" : defaultFilter.getFilterEndTimeStamp().toString());
@@ -103,12 +112,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        Log.i("findPhotos", "61");
         return photos;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void scrollPhotos(View v) {
-        Log.i("scrollPhotos", "66");
         try {
             updatePhoto(photos.get(index), ((EditText) findViewById(R.id.etCaption)).getText().toString());
             if (index > (photos.size() - 1)) // with an active caption filter, changing the last image's caption
@@ -118,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         } catch (IndexOutOfBoundsException e) {
-            Log.i("empty photos global", "...");
             return;
         }
 
@@ -140,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
         displayPhoto(photos.get(index));
     }
     private void displayPhoto(String path) {
-        Log.i("displayPhoto", "86");
         ImageView iv = (ImageView) findViewById(R.id.ivGallery);
         TextView tv = (TextView) findViewById(R.id.tvTimestamp);
         EditText et = (EditText) findViewById(R.id.etCaption);
@@ -151,29 +157,24 @@ public class MainActivity extends AppCompatActivity {
         } else {
             iv.setImageBitmap(BitmapFactory.decodeFile(path));
             mBitMap = BitmapFactory.decodeFile(path);
-//            String[] attr = path.split("_");
             String[] attr = path.split("#");
             String timeStamp = attr[2].split("\\.")[0];
-//            Log.i("REALTIMESTAMP", otherAttr[1].split("\\.")[0]);
             for (int i = 0; i < attr.length; i++)
-                Log.i("attr " + i, attr[i]);
-//            Log.i("attrs", attr);
             et.setText(attr[1]);
             tv.setText(timeStamp);
         }
     }
     private File createImageFile() throws IOException {
-        Log.i("createImageFile", "102");
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "#caption#" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg",storageDir);
         mCurrentPhotoPath = image.getAbsolutePath();
-        Log.i("photo", mCurrentPhotoPath);
         return image;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         String from = (String) data.getStringExtra("STARTTIMESTAMP");
@@ -184,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_FILTER) {
             if (resultCode == RESULT_OK) {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
-//                Date filterStartTimestamp , filterEndTimestamp;
                 try {
 //                    Log.i("from", from);
 //                    Log.i("to", to);
@@ -204,13 +204,10 @@ public class MainActivity extends AppCompatActivity {
 //                Log.i("from", filterStartTimestamp.toString());
 //                Log.i("to", filterEndTimestamp.toString());
                 index = 0;
-                Log.i("finding photos", "...");
                 photos = findPhotos();
                 if (photos.size() == 0) {
-                    Log.i("photo", "not found");
                     displayPhoto(null);
                 } else {
-                    Log.i("photo", "found photo");
                     displayPhoto(photos.get(index));
                 }
             }
@@ -227,10 +224,10 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void updatePhoto(String path, String caption) {
         String[] attr = path.split("#");
         if (attr.length >= 3) {
-            Log.i("new pathname:", attr[0] + "#" + caption + "#" + attr[2]);
             File to = new File(attr[0] + "#" + caption + "#" + attr[2]);
             File from = new File(path);
             from.renameTo(to);
@@ -243,10 +240,10 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_IMAGE_FILTER);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void goShare(View view) {
         photos = findPhotos();
         if (photos.size() == 0) {
-            Log.i("Error", "No photos");
         } else {
             sharePicturesIntent(1, mBitMap);
         }
@@ -257,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
         Uri uri = Uri.parse(filePath);
 
         Intent sendPhotoIntent = new Intent(Intent.ACTION_SEND);
+        sendPhotoIntent.setAction(Intent.ACTION_GET_CONTENT);
         sendPhotoIntent.setType("image/jpg");
         sendPhotoIntent.putExtra(Intent.EXTRA_STREAM, uri);
 
