@@ -21,18 +21,18 @@ public class MainActivity extends AppCompatActivity {
     Bitmap mBitMap;
     private ArrayList<String> photos = null;
     private int index = 0;
-    private Date filterStartTimestamp = null;
-    private Date filterEndTimestamp = null;
-    private String filterCaption = null;
+    Filter defaultFilter = null;
+    Filter newFilter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 //        photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), "");
-        filterStartTimestamp = new Date(Long.MIN_VALUE);
-        filterEndTimestamp = new Date();
-        filterCaption = "";
+        Filter filter = new Filter.FilterBuilder(new Date(Long.MIN_VALUE), new Date())
+                .withCaption("")
+                .build();
+        defaultFilter = filter;
         photos = findPhotos();
         if (photos.size() == 0) {
             displayPhoto(null);
@@ -60,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
     }
 //    private ArrayList<String> findPhotos(Date filterStartTimestamp, Date filterEndTimestamp, String keywords) {
     private ArrayList<String> findPhotos() {
-        Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
-        Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
+        Log.i("startDateFilter", defaultFilter.getFilterStartTimeStamp() == null ? "" : defaultFilter.getFilterStartTimeStamp().toString());
+        Log.i("endDateFilter", defaultFilter.getFilterEndTimeStamp() == null ? "" : defaultFilter.getFilterEndTimeStamp().toString());
         Log.i("findPhotos", "49");
         Log.i("findPhotos", Environment.getExternalStorageDirectory().toString());
         File file = new File(Environment.getExternalStorageDirectory()
@@ -70,18 +70,33 @@ public class MainActivity extends AppCompatActivity {
         File[] fList = file.listFiles();
 //null in fList
 //        Log.i("findPhotos", fList.toString());
-        if (fList != null) {
+        if (newFilter != null) {
+            if (fList != null) {
+                for (File f : fList) {
+                    if (((newFilter.getFilterStartTimeStamp() == null && newFilter.getFilterEndTimeStamp() == null) || (f.lastModified() >= newFilter.getFilterStartTimeStamp().getTime() && f.lastModified() <= newFilter.getFilterEndTimeStamp().getTime())) && (newFilter.getFilterCaption() == "" || newFilter.getFilterCaption() == null || f.getPath().contains(newFilter.getFilterCaption()))) {
+                        Log.i("startDateFilter", newFilter.getFilterStartTimeStamp() == null ? "" : newFilter.getFilterStartTimeStamp().toString());
+                        Log.i("endDateFilter", newFilter.getFilterEndTimeStamp() == null ? "" : newFilter.getFilterEndTimeStamp().toString());
+                        photos.add(f.getPath());
+                        Log.i("keywords", newFilter.getFilterCaption());
+//                    Log.i("photo-path", f.getPath());
+                        Log.i("photo-timestamp", new Date(f.lastModified()).toString());
+                        Log.i("findPhotos", "for loop if");
+                    }
+                }
+            }
+        }
+        if (newFilter == null && fList != null) {
             Log.i("findPhotos", "in if");
             for (File f : fList) {
 //                Log.i("findPhotos", f.toString());
 //                Log.i("findPhotos", f.getPath());
 //                Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
 //                Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
-                if (((filterStartTimestamp == null && filterEndTimestamp == null) || (f.lastModified() >= filterStartTimestamp.getTime() && f.lastModified() <= filterEndTimestamp.getTime())) && (filterCaption == "" || filterCaption == null || f.getPath().contains(filterCaption))) {
-                    Log.i("startDateFilter", filterStartTimestamp == null ? "" : filterStartTimestamp.toString());
-                    Log.i("endDateFilter", filterEndTimestamp == null ? "" : filterEndTimestamp.toString());
+                if (((defaultFilter.getFilterStartTimeStamp() == null && defaultFilter.getFilterEndTimeStamp() == null) || (f.lastModified() >= defaultFilter.getFilterStartTimeStamp().getTime() && f.lastModified() <= defaultFilter.getFilterEndTimeStamp().getTime())) && (defaultFilter.getFilterCaption() == "" || defaultFilter.getFilterCaption() == null || f.getPath().contains(defaultFilter.getFilterCaption()))) {
+                    Log.i("startDateFilter", defaultFilter.getFilterStartTimeStamp() == null ? "" : defaultFilter.getFilterStartTimeStamp().toString());
+                    Log.i("endDateFilter", defaultFilter.getFilterEndTimeStamp() == null ? "" : defaultFilter.getFilterEndTimeStamp().toString());
                     photos.add(f.getPath());
-                    Log.i("keywords", filterCaption);
+                    Log.i("keywords", defaultFilter.getFilterCaption());
 //                    Log.i("photo-path", f.getPath());
                     Log.i("photo-timestamp", new Date(f.lastModified()).toString());
                     Log.i("findPhotos", "for loop if");
@@ -161,6 +176,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        String from = (String) data.getStringExtra("STARTTIMESTAMP");
+        String to = (String) data.getStringExtra("ENDTIMESTAMP");
+        String keyword = (String) data.getStringExtra("KEYWORDS");
         Log.i("onActivityResult", "115");
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_FILTER) {
@@ -168,20 +186,21 @@ public class MainActivity extends AppCompatActivity {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
 //                Date filterStartTimestamp , filterEndTimestamp;
                 try {
-                    String from = (String) data.getStringExtra("filterStartTimestamp");
-                    String to = (String) data.getStringExtra("filterEndTimestamp");
 //                    Log.i("from", from);
 //                    Log.i("to", to);
-                    filterStartTimestamp = format.parse(from);
-                    filterEndTimestamp = format.parse(to);
+                    Filter newFilterNoCaption = new Filter.FilterBuilder(format.parse(from), format.parse(to))
+                            .withCaption(keyword)
+                            .build();
+                    newFilter = newFilterNoCaption;
                 } catch (Exception ex) {
                     Log.i("Exception?", ex.toString());
-                    filterStartTimestamp = null;
-                    filterEndTimestamp = null;
+                    Filter newFilterException = new Filter.FilterBuilder(null, null)
+                            .withCaption("")
+                            .build();
+                    newFilter = newFilterException;
                 }
-                filterCaption = (String) data.getStringExtra("KEYWORDS");
                 Log.i("intent", String.valueOf(data));
-                Log.i("tag", filterCaption);
+//                Log.i("tag", filterCaption);
 //                Log.i("from", filterStartTimestamp.toString());
 //                Log.i("to", filterEndTimestamp.toString());
                 index = 0;
@@ -196,15 +215,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Log.i("is this getting called?", "...");
-            ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
-            mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
-            filterStartTimestamp = new Date(Long.MIN_VALUE);
-            filterEndTimestamp = new Date();
-            filterCaption = "";
-            photos = findPhotos();
-        }
+//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+//            Log.i("is this getting called?", "...");
+//            ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
+//            mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
+//            Filter filter = new Filter.FilterBuilder(new Date(Long.MIN_VALUE), new Date())
+//                    .withCaption("")
+//                    .build();
+//            defaultFilter = filter;
+//            photos = findPhotos();
+//        }
     }
 
     private void updatePhoto(String path, String caption) {
