@@ -27,6 +27,7 @@ public class SearchActivity extends AppCompatActivity {
         } catch (Exception ex) { }
     }
     public void cancel(final View v) {
+        setResult(RESULT_CANCELED, null);
         finish();
     }
     public void go(final View v) {

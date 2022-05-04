@@ -24,6 +24,7 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_FILTER = 2;
+    static final int REQUEST_SEARCH_CANCEL = 0;
     String mCurrentPhotoPath;
     Bitmap mBitMap;
     private ArrayList<String> photos = null;
@@ -177,21 +178,15 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String from = (String) data.getStringExtra("STARTTIMESTAMP");
-        String to = (String) data.getStringExtra("ENDTIMESTAMP");
-        String keyword = (String) data.getStringExtra("KEYWORDS");
-        Log.i("onActivityResult", "115");
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_FILTER) {
-            if (resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_SEARCH_CANCEL) {
+            if (resultCode == RESULT_CANCELED) {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
                 try {
-//                    Log.i("from", from);
-//                    Log.i("to", to);
-                    Filter newFilterNoCaption = new Filter.FilterBuilder(format.parse(from), format.parse(to))
-                            .withCaption(keyword)
+
+                    Filter resetFilter = new Filter.FilterBuilder(new Date(Long.MIN_VALUE), new Date())
+                            .withCaption("")
                             .build();
-                    newFilter = newFilterNoCaption;
+                    newFilter = resetFilter;
                 } catch (Exception ex) {
                     Log.i("Exception?", ex.toString());
                     Filter newFilterException = new Filter.FilterBuilder(null, null)
@@ -200,9 +195,7 @@ public class MainActivity extends AppCompatActivity {
                     newFilter = newFilterException;
                 }
                 Log.i("intent", String.valueOf(data));
-//                Log.i("tag", filterCaption);
-//                Log.i("from", filterStartTimestamp.toString());
-//                Log.i("to", filterEndTimestamp.toString());
+
                 index = 0;
                 photos = findPhotos();
                 if (photos.size() == 0) {
@@ -212,16 +205,40 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            Log.i("is this getting called?", "...");
-//            ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
-//            mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
-//            Filter filter = new Filter.FilterBuilder(new Date(Long.MIN_VALUE), new Date())
-//                    .withCaption("")
-//                    .build();
-//            defaultFilter = filter;
-//            photos = findPhotos();
-//        }
+
+        Log.i("onActivityResult", "115");
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_FILTER) {
+            if (resultCode == RESULT_OK) {
+                String from = (String) data.getStringExtra("STARTTIMESTAMP");
+                String to = (String) data.getStringExtra("ENDTIMESTAMP");
+                String keyword = (String) data.getStringExtra("KEYWORDS");
+                DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
+                try {
+
+                    Filter filter = new Filter.FilterBuilder(format.parse(from), format.parse(to))
+                            .withCaption(keyword)
+                            .build();
+                    newFilter = filter;
+                } catch (Exception ex) {
+                    Log.i("Exception?", ex.toString());
+                    Filter newFilterException = new Filter.FilterBuilder(null, null)
+                            .withCaption("")
+                            .build();
+                    newFilter = newFilterException;
+                }
+                Log.i("intent", String.valueOf(data));
+
+                index = 0;
+                photos = findPhotos();
+                if (photos.size() == 0) {
+                    displayPhoto(null);
+                } else {
+                    displayPhoto(photos.get(index));
+                }
+            }
+        }
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
