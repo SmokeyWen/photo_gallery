@@ -55,10 +55,10 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
         }
     }
     public void takePhoto(View v) {
-        presenter.takePhoto();
+        presenter.takePhoto(photoRepository);
     }
 
-    public void scrollPhotos(View v) {presenter.scrollPhotos();}
+    public void scrollPhotos(View v) {presenter.scrollPhotos(v);}
 
 //    public void goSearch(View v) {
 //        Intent intent = new Intent(this, SearchActivity.class);
@@ -72,42 +72,42 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
         }
     };
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        presenter.onReturn(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_IMAGE_FILTER) {
-            if (resultCode == RESULT_OK) {
-                DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
-                try {
-                    String from = (String) data.getStringExtra("filterStartTimestamp");
-                    String to = (String) data.getStringExtra("filterEndTimestamp");
-                    filterStartTimestamp = format.parse(from);
-                    filterEndTimestamp = format.parse(to);
-                } catch (Exception ex) {
-                    filterStartTimestamp = null;
-                    filterEndTimestamp = null;
-                }
-                filterCaption = (String) data.getStringExtra("KEYWORDS");
-                index = 0;
-                photos = findPhotos();
-                if (photos.size() == 0) {
-                    displayPhoto(null);
-                } else {
-                    displayPhoto(photos.get(index));
-                }
-            }
-        }
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
-            mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
-            filterStartTimestamp = new Date(Long.MIN_VALUE);
-            filterEndTimestamp = new Date();
-            filterCaption = "";
-            photos = findPhotos();
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        presenter.onReturn(requestCode, resultCode, data);
+//
+//        if (requestCode == REQUEST_IMAGE_FILTER) {
+//            if (resultCode == RESULT_OK) {
+//                DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
+//                try {
+//                    String from = (String) data.getStringExtra("filterStartTimestamp");
+//                    String to = (String) data.getStringExtra("filterEndTimestamp");
+//                    filterStartTimestamp = format.parse(from);
+//                    filterEndTimestamp = format.parse(to);
+//                } catch (Exception ex) {
+//                    filterStartTimestamp = null;
+//                    filterEndTimestamp = null;
+//                }
+//                filterCaption = (String) data.getStringExtra("KEYWORDS");
+//                index = 0;
+//                photos = findPhotos();
+//                if (photos.size() == 0) {
+//                    displayPhoto(null);
+//                } else {
+//                    displayPhoto(photos.get(index));
+//                }
+//            }
+//        }
+//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+//            ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
+//            mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
+//            filterStartTimestamp = new Date(Long.MIN_VALUE);
+//            filterEndTimestamp = new Date();
+//            filterCaption = "";
+//            photos = findPhotos();
+//        }
+//    }
 
     @Override
     public void displayPhoto(Bitmap photo, String caption, String timestamp) {

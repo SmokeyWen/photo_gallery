@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import androidx.core.content.FileProvider;
 import com.example.photo_gallery.Model.Photo;
 import com.example.photo_gallery.Model.PhotoRepository;
+import com.example.photo_gallery.R;
 import com.example.photo_gallery.SearchActivity;
 
 import java.io.File;
@@ -41,7 +43,7 @@ public class GalleryPresenter {
             Photo photo = repository.create();
             // Continue only if the File was successfully created
             if (photo.getPhotoFile() != null) {
-                Uri photoURI = FileProvider.getUriForFile(context, "com.example.photo_gallery.fileprovider", photoFile);
+                Uri photoURI = FileProvider.getUriForFile(context, "com.example.photo_gallery.fileprovider", photo.getPhotoFile());
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 context.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
@@ -64,7 +66,7 @@ public class GalleryPresenter {
 //        return photos;
     }
 
-    public void scrollPhotos() {
+    public void scrollPhotos(android.view.View v) {
         try {
 //            updatePhoto(photos.get(index), ((EditText) findViewById(R.id.etCaption)).getText().toString());
             photos.get(index).setCaption(((EditText) context.findViewById(R.id.etCaption)).getText().toString());
