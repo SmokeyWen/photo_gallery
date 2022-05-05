@@ -1,8 +1,11 @@
 package com.example.photo_gallery.Model;
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 public class Photo {
     private File photoFile;
@@ -11,7 +14,18 @@ public class Photo {
     private Bitmap bitmap;
     private String path;
 
-    public Photo(File photoFile){}
+    public Photo(File photoFile){
+        this.photoFile = photoFile;
+        this.path = photoFile.getPath();
+        String[] attr = this.path.split("#");
+        this.caption = attr[1];
+        this.bitmap = BitmapFactory.decodeFile(this.path);
+        try {
+            this.timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").parse(attr[2].split("\\.")[0]);
+        } catch (ParseException pe) {
+            this.timeStamp = null;
+        }
+    }
 
     public File getPhotoFile() {
         return photoFile;
@@ -27,7 +41,8 @@ public class Photo {
     public Bitmap getBitmap() {
         return bitmap;
     }
-    public void updateCaption (String caption) {
+
+    public void setCaption (String caption) {
         String[] attr = path.split("#");
         if (attr.length >= 3) {
             File to = new File(attr[0] + "#" + caption + "#" + attr[2]);

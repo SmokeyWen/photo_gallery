@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Environment;
 import androidx.annotation.RequiresApi;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,14 +21,15 @@ public class PhotoRepository implements IPhotoRepository {
     public ArrayList<Photo> findPhotos(Date startTimestamp, Date endTimestamp, String keywords) {
         File file = new File(Environment.getExternalStorageDirectory()
                 .getAbsolutePath(), "/Android/data/com.example.photo_gallery/files/Pictures");
-        ArrayList<String> photos = new ArrayList<String>();
+        ArrayList<Photo> photos = new ArrayList<>();
         File[] fList = file.listFiles();
 
         if (fList != null) {
             Stream<File> fileStream = Arrays.stream(fList);
             Stream<File> findFileStream = fileStream.filter(f -> ((startTimestamp == null && endTimestamp == null) || (f.lastModified() >= startTimestamp.getTime() && f.lastModified() <= endTimestamp.getTime())) && (keywords == "" || keywords == null || f.getPath().contains(keywords)));
-            findFileStream.forEach(f -> photos.add(f.getPath()));
+            findFileStream.forEach(f -> photos.add(new Photo(f)));
         }
+
         return photos;
     }
 
@@ -36,10 +38,15 @@ public class PhotoRepository implements IPhotoRepository {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "#caption#" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName, ".jpg",storageDir);
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
+        File storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image;
+        try {
+            image = File.createTempFile(imageFileName, ".jpg",storageDir);
+        } catch (IOException e) {
+            image = null;
+        }
+        String mCurrentPhotoPath = image.getAbsolutePath();
+        return new Photo(image);
     }
 
 }
