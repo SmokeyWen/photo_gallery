@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
     Bitmap mBitMap;
     private ArrayList<String> photos = null;
     private int index = 0;
-    Filter defaultFilter = null;
-    Filter newFilter = null;
+    IFilter defaultFilter = null;
+    IFilter newFilter = null;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -38,10 +38,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 //        photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), "");
-        Filter filter = new Filter.FilterBuilder(new Date(Long.MIN_VALUE), new Date())
-                .withCaption("")
-                .build();
-        defaultFilter = filter;
+        IFilter defaultFilter = new DateFilter(new BasicFilter(), "", new Date(Long.MIN_VALUE), new Date(), "");
+//        Filter filter = new Filter.FilterBuilder(new Date(Long.MIN_VALUE), new Date())
+//                .withCaption("")
+//                .build();
+//        defaultFilter = filter;
         photos = findPhotos();
         if (photos.size() == 0) {
             displayPhoto(null);
@@ -70,10 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private ArrayList<String> findPhotos() {
-        Log.i("startDateFilter", defaultFilter.getFilterStartTimeStamp() == null ? "" : defaultFilter.getFilterStartTimeStamp().toString());
-        Log.i("endDateFilter", defaultFilter.getFilterEndTimeStamp() == null ? "" : defaultFilter.getFilterEndTimeStamp().toString());
-        Log.i("findPhotos", "49");
-        Log.i("findPhotos", Environment.getExternalStorageDirectory().toString());
+//        Log.i("startDateFilter", defaultFilter.getFilterStartTimeStamp() == null ? "" : defaultFilter.getFilterStartTimeStamp().toString());
+//        Log.i("endDateFilter", defaultFilter.getFilterEndTimeStamp() == null ? "" : defaultFilter.getFilterEndTimeStamp().toString());
+//        Log.i("findPhotos", "49");
+//        Log.i("findPhotos", Environment.getExternalStorageDirectory().toString());
         File file = new File(Environment.getExternalStorageDirectory()
                 .getAbsolutePath(), "/Android/data/com.example.photo_gallery/files/Pictures");
         ArrayList<String> photos = new ArrayList<String>();
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         if (newFilter != null) {
             if (fList != null) {
                 for (File f : fList) {
-                    if (((newFilter.getFilterStartTimeStamp() == null && newFilter.getFilterEndTimeStamp() == null) || (f.lastModified() >= newFilter.getFilterStartTimeStamp().getTime() && f.lastModified() <= newFilter.getFilterEndTimeStamp().getTime())) && (newFilter.getFilterCaption() == "" || newFilter.getFilterCaption() == null || f.getPath().contains(newFilter.getFilterCaption()))) {
+                    if (((newFilter.filterStartTimeStamp == null && newFilter.getFilterEndTimeStamp() == null) || (f.lastModified() >= newFilter.getFilterStartTimeStamp().getTime() && f.lastModified() <= newFilter.getFilterEndTimeStamp().getTime())) && (newFilter.getFilterCaption() == "" || newFilter.getFilterCaption() == null || f.getPath().contains(newFilter.getFilterCaption()))) {
                         Log.i("startDateFilter", newFilter.getFilterStartTimeStamp() == null ? "" : newFilter.getFilterStartTimeStamp().toString());
                         Log.i("endDateFilter", newFilter.getFilterEndTimeStamp() == null ? "" : newFilter.getFilterEndTimeStamp().toString());
                         photos.add(f.getPath());
@@ -183,15 +184,11 @@ public class MainActivity extends AppCompatActivity {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
                 try {
 
-                    Filter resetFilter = new Filter.FilterBuilder(new Date(Long.MIN_VALUE), new Date())
-                            .withCaption("")
-                            .build();
+                    IFilter resetFilter = new DateFilter(new BasicFilter(), "", new Date(Long.MIN_VALUE), new Date(), "");
                     newFilter = resetFilter;
                 } catch (Exception ex) {
                     Log.i("Exception?", ex.toString());
-                    Filter newFilterException = new Filter.FilterBuilder(null, null)
-                            .withCaption("")
-                            .build();
+                    IFilter newFilterException = new DateFilter(new BasicFilter(), "", null, null, "");
                     newFilter = newFilterException;
                 }
                 Log.i("intent", String.valueOf(data));
@@ -216,9 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
                 try {
 
-                    Filter filter = new Filter.FilterBuilder(format.parse(from), format.parse(to))
-                            .withCaption(keyword)
-                            .build();
+                    IFilter filter = new CaptionFilter(new DateFilter(new BasicFilter(), keyword, format.parse(from), format.parse(to), ""));
                     newFilter = filter;
                 } catch (Exception ex) {
                     Log.i("Exception?", ex.toString());
