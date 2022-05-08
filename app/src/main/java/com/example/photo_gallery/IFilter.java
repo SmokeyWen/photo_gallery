@@ -5,5 +5,5 @@ import java.util.ArrayList;
 import java.util.stream.Stream;
 
 public interface IFilter {
-    ArrayList<String> filterPhotos(Stream<File> photos);
+    Stream<File> filterPhotos(Stream<File> photos);
 }

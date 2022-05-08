@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 public class BasicFilter implements IFilter{
     @Override
-    public ArrayList<String> filterPhotos(Stream<File> photos) {
+    public Stream<File> filterPhotos(Stream<File> photos) {
         return null;
     }
 }

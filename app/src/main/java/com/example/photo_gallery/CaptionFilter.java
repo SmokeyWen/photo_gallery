@@ -10,17 +10,20 @@ import java.util.Date;
 import java.util.stream.Stream;
 
 public class CaptionFilter extends FilterDecorator{
-    public CaptionFilter(IFilter filter, String filterCaption, Date filterStartTimeStamp, Date filterEndTimeStamp, String latLng) {
-        super(filter, filterCaption, filterStartTimeStamp, filterEndTimeStamp, latLng);
+    private String filterCaption;
+
+    public CaptionFilter(IFilter filter, String filterCaption) {
+        super(filter);
+        this.filterCaption = filterCaption;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    public ArrayList<String> filterPhotos(Stream<File> photos) {
-        super.filterPhotos(photos);
-        ArrayList<String> photo_res = new ArrayList<String>();
-        Stream<File> findFileStream = photos.filter(f -> ((filterCaption == "" || filterCaption == null || f.getPath().contains(filterCaption))));
-        findFileStream.forEach(f -> photo_res.add(f.getPath()));
-        return photo_res;
+    public Stream<File> filterPhotos(Stream<File> photos) {
+        Stream<File> filterdPhotos = this.getFilter().filterPhotos(photos);
+//        ArrayList<String> photo_res = new ArrayList<String>();
+        Stream<File> findFileStream = filterdPhotos.filter(f -> ((filterCaption == "" || filterCaption == null || f.getPath().contains(filterCaption))));
+//        findFileStream.forEach(f -> photo_res.add(f.getPath()));
+        return findFileStream;
     }
 }
