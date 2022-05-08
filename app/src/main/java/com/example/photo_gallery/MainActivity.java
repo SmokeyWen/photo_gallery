@@ -2,13 +2,16 @@ package com.example.photo_gallery;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.photo_gallery.Model.Photo;
@@ -30,9 +33,9 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
     private Date filterStartTimestamp = null;
     private Date filterEndTimestamp = null;
     private String filterCaption = null;
-    private PhotoRepository photoRepository = null;
 
     GalleryPresenter presenter = null;
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,24 +44,26 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
         Button searchBtn = (Button) findViewById(R.id.btnSearch);
         searchBtn.setOnClickListener(searchListener);
     }
+
     public void onClick( View v) {
         String caption = ((EditText) findViewById(R.id.etCaption)).getText().toString();
+        Log.i("did we get ", "in here?");
         switch (v.getId()) {
             case R.id.btnNext:
-                presenter.handleNavigationInput("ScrollLeft", caption);
+                presenter.handleNavigationInput("ScrollPrev", caption);
                 break;
             case R.id.btnPrev:
-                presenter.handleNavigationInput("ScrollRight", caption);
+                presenter.handleNavigationInput("ScrollNext", caption);
                 break;
             default:
                 break;
         }
     }
     public void takePhoto(View v) {
-        presenter.takePhoto(photoRepository);
+        presenter.takePhoto();
     }
 
-    public void scrollPhotos(View v) {presenter.scrollPhotos(v);}
+//    public void scrollPhotos(View v) {presenter.scrollPhotos(v);}
 
 //    public void goSearch(View v) {
 //        Intent intent = new Intent(this, SearchActivity.class);
@@ -72,53 +77,51 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
         }
     };
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        presenter.onReturn(requestCode, resultCode, data);
-//
-//        if (requestCode == REQUEST_IMAGE_FILTER) {
-//            if (resultCode == RESULT_OK) {
-//                DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
-//                try {
-//                    String from = (String) data.getStringExtra("filterStartTimestamp");
-//                    String to = (String) data.getStringExtra("filterEndTimestamp");
-//                    filterStartTimestamp = format.parse(from);
-//                    filterEndTimestamp = format.parse(to);
-//                } catch (Exception ex) {
-//                    filterStartTimestamp = null;
-//                    filterEndTimestamp = null;
-//                }
-//                filterCaption = (String) data.getStringExtra("KEYWORDS");
-//                index = 0;
-//                photos = findPhotos();
-//                if (photos.size() == 0) {
-//                    displayPhoto(null);
-//                } else {
-//                    displayPhoto(photos.get(index));
-//                }
-//            }
-//        }
-//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
-//            mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
-//            filterStartTimestamp = new Date(Long.MIN_VALUE);
-//            filterEndTimestamp = new Date();
-//            filterCaption = "";
-//            photos = findPhotos();
-//        }
-//    }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        presenter.onReturn(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_IMAGE_FILTER) {
+            if (resultCode == RESULT_OK) {
+                DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
+                try {
+                    String from = (String) data.getStringExtra("filterStartTimestamp");
+                    String to = (String) data.getStringExtra("filterEndTimestamp");
+                    filterStartTimestamp = format.parse(from);
+                    filterEndTimestamp = format.parse(to);
+                } catch (Exception ex) {
+                    filterStartTimestamp = null;
+                    filterEndTimestamp = null;
+                }
+                filterCaption = (String) data.getStringExtra("KEYWORDS");
+                presenter.filterAndDisplay(filterStartTimestamp, filterEndTimestamp, filterCaption);
+            }
+        }
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            ImageView mImageView = (ImageView) findViewById(R.id.ivGallery);
+            mImageView.setImageBitmap(BitmapFactory.decodeFile(mCurrentPhotoPath));
+            filterStartTimestamp = new Date(Long.MIN_VALUE);
+            filterEndTimestamp = new Date();
+            filterCaption = "";
+            presenter.filterAndDisplay(filterStartTimestamp, filterEndTimestamp, filterCaption);
+        }
+    }
 
     @Override
-    public void displayPhoto(Bitmap photo, String caption, String timestamp) {
+    public void displayPhoto(Bitmap photo, String caption, Date timestamp) {
         ImageView iv = (ImageView) findViewById(R.id.ivGallery);
         TextView tv = (TextView) findViewById(R.id.tvTimestamp);
         EditText et = (EditText) findViewById(R.id.etCaption);
-        et.setText(caption);
-        tv.setText(timestamp);
-        if (photo == null)
+        et.setText("");
+        tv.setText("");
+        if (photo == null) {
             iv.setImageResource(R.mipmap.ic_launcher);
-        else
+        } else {
             iv.setImageBitmap(photo);
+            et.setText(caption);
+            tv.setText(new SimpleDateFormat("yyyyMMdd_HHmmss").format(timestamp));
+        }
     }
 }

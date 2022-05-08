@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public interface IPhotoRepository {
-    public default ArrayList<Photo> findPhotos(Date StartTimeStamp, Date endTimeStamp, String keywords) {
+    public default ArrayList<Photo> findPhotos(Filter filter) {
         return null;
     }
 

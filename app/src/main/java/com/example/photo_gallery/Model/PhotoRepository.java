@@ -3,6 +3,8 @@ package com.example.photo_gallery.Model;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
+
 import androidx.annotation.RequiresApi;
 import java.io.File;
 import java.io.IOException;
@@ -15,14 +17,21 @@ import java.util.stream.Stream;
 public class PhotoRepository implements IPhotoRepository {
 
     private Context context;
-    public PhotoRepository(Context context) {  }
+    public PhotoRepository(Context context) {
+        this.context = context;
+    }
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    public ArrayList<Photo> findPhotos(Date startTimestamp, Date endTimestamp, String keywords) {
+    public ArrayList<Photo> findPhotos(Filter filter) {
+        Log.i("filtering photos on: ", filter.toString());
         File file = new File(Environment.getExternalStorageDirectory()
                 .getAbsolutePath(), "/Android/data/com.example.photo_gallery/files/Pictures");
         ArrayList<Photo> photos = new ArrayList<>();
         File[] fList = file.listFiles();
+
+        Date startTimestamp = filter.getFilterStartTimeStamp();
+        Date endTimestamp = filter.getFilterEndTimeStamp();
+        String keywords = filter.getFilterCaption();
 
         if (fList != null) {
             Stream<File> fileStream = Arrays.stream(fList);
