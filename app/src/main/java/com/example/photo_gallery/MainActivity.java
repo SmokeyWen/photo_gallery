@@ -42,23 +42,16 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
         setContentView(R.layout.activity_main);
         presenter = new GalleryPresenter(this);
         Button searchBtn = (Button) findViewById(R.id.btnSearch);
+        Button nxtBtn = (Button) findViewById(R.id.btnNext);
+        Button prevBtn = (Button) findViewById(R.id.btnPrev);
         searchBtn.setOnClickListener(searchListener);
+        nxtBtn.setOnClickListener(nextPhotoListener);
+        prevBtn.setOnClickListener(prevPhotoListener);
     }
 
-    public void onClick( View v) {
-        String caption = ((EditText) findViewById(R.id.etCaption)).getText().toString();
-        Log.i("did we get ", "in here?");
-        switch (v.getId()) {
-            case R.id.btnNext:
-                presenter.handleNavigationInput("ScrollPrev", caption);
-                break;
-            case R.id.btnPrev:
-                presenter.handleNavigationInput("ScrollNext", caption);
-                break;
-            default:
-                break;
-        }
+    public void onClick(View v) {
     }
+
     public void takePhoto(View v) {
         presenter.takePhoto();
     }
@@ -77,6 +70,22 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
         }
     };
 
+    private View.OnClickListener nextPhotoListener = new View.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        public void onClick(View v) {
+            String caption = ((EditText) findViewById(R.id.etCaption)).getText().toString();
+            presenter.handleNavigationInput("ScrollNext", caption);
+        }
+    };
+
+    private View.OnClickListener prevPhotoListener = new View.OnClickListener() {
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        public void onClick(View v) {
+            String caption = ((EditText) findViewById(R.id.etCaption)).getText().toString();
+            presenter.handleNavigationInput("ScrollPrev", caption);
+        }
+    };
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -87,8 +96,8 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
             if (resultCode == RESULT_OK) {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
                 try {
-                    String from = (String) data.getStringExtra("filterStartTimestamp");
-                    String to = (String) data.getStringExtra("filterEndTimestamp");
+                    String from = (String) data.getStringExtra("STARTTIMESTAMP");
+                    String to = (String) data.getStringExtra("ENDTIMESTAMP");
                     filterStartTimestamp = format.parse(from);
                     filterEndTimestamp = format.parse(to);
                 } catch (Exception ex) {

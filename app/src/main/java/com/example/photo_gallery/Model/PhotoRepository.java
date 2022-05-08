@@ -39,6 +39,8 @@ public class PhotoRepository implements IPhotoRepository {
             findFileStream.forEach(f -> photos.add(new Photo(f)));
         }
 
+        Log.i("photos", photos.toString());
+
         return photos;
     }
 

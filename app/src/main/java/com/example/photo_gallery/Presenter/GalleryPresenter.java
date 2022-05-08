@@ -46,6 +46,7 @@ public class GalleryPresenter {
         index = 0;
         currFilter = Filter.FilterBuilder.EMPTY_FILTER;
         photos = repository.findPhotos(currFilter);
+        photos.stream().forEach(x -> Log.i("test", x.getCaption()));
         if (photos.size() > 0) {
             Photo firstPhoto = photos.get(index);
             ((GalleryPresenter.View) this.context).displayPhoto(firstPhoto.getBitmap(),
@@ -94,9 +95,11 @@ public class GalleryPresenter {
 
 
     public void onReturn(int requestCode, int resultCode, Intent data) { }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void handleNavigationInput(String navigationAction, String caption)  {
         try {
-            photos.get(index).setCaption(caption);
+            photos.get(index).setCaption(caption); // update caption
+            photos = repository.findPhotos(currFilter); // refilter list of photos
             if (index > (photos.size() - 1)) // with an active caption filter, changing the last image's caption
                 index = photos.size() - 1;   // causes errors. this will rectify it.
             if (photos.size() == 0) { // if we remove the only image that existed, we ought to
@@ -113,16 +116,26 @@ public class GalleryPresenter {
             case "ScrollPrev":
                 if (index > 0) {
                     index--;
+                    this.displayPhoto();
                 }
                 break;
             case "ScrollNext":
+                Log.i("index", String.valueOf(index));
+                Log.i("photos.size()", String.valueOf(photos.size()));
                 if (index < (photos.size() - 1)) {
                     index++;
+                    this.displayPhoto();
                 }
                 break;
             default:
                 break;
         }
+    }
+
+    public void displayPhoto() {
+        Photo photo = photos.get(index);
+        ((GalleryPresenter.View) context).displayPhoto(photo.getBitmap(),
+                photo.getCaption(), photo.getTimestamp());
     }
 
     public interface View {
