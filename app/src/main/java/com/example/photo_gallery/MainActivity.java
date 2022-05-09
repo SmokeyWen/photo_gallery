@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,9 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.photo_gallery.Model.Photo;
 import com.example.photo_gallery.Presenter.GalleryPresenter;
-import com.example.photo_gallery.Model.PhotoRepository;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -26,13 +23,11 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity implements GalleryPresenter.View, View.OnClickListener{
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_IMAGE_FILTER = 2;
+//    static final int REQUEST_SEARCH_CANCEL = 0;
     String mCurrentPhotoPath;
-    Bitmap mBitMap;
+//    Bitmap mBitMap;
     private ArrayList<String> photos = null;
-    private int index = 0;
-    private Date filterStartTimestamp = null;
-    private Date filterEndTimestamp = null;
-    private String filterCaption = null;
+//    private int index = 0;
 
     GalleryPresenter presenter = null;
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -50,6 +45,11 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
     }
 
     public void onClick(View v) {
+//        photos = findPhotos(new Date(Long.MIN_VALUE), new Date(), "");
+//        Filter filter = new Filter.FilterBuilder(new Date(Long.MIN_VALUE), new Date())
+//                .withCaption("")
+//                .build();
+//        defaultFilter = filter;
     }
 
     public void takePhoto(View v) {
@@ -91,6 +91,9 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         presenter.onReturn(requestCode, resultCode, data);
+        Date filterStartTimestamp;
+        Date filterEndTimestamp;
+        String filterCaption = null;
 
         if (requestCode == REQUEST_IMAGE_FILTER) {
             if (resultCode == RESULT_OK) {
@@ -117,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements GalleryPresenter.
             presenter.filterAndDisplay(filterStartTimestamp, filterEndTimestamp, filterCaption);
         }
     }
+
 
     @Override
     public void displayPhoto(Bitmap photo, String caption, Date timestamp) {

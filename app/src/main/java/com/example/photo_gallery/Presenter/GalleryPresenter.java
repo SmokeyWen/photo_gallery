@@ -17,7 +17,10 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
 
+import com.example.photo_gallery.Model.BasicFilter;
 import com.example.photo_gallery.Model.Filter;
+import com.example.photo_gallery.Model.FilterBuilder;
+import com.example.photo_gallery.Model.IFilter;
 import com.example.photo_gallery.Model.Photo;
 import com.example.photo_gallery.Model.PhotoRepository;
 import com.example.photo_gallery.R;
@@ -36,15 +39,17 @@ public class GalleryPresenter {
     private Activity context;
     private PhotoRepository repository;
     private ArrayList<Photo> photos = null;
-    private Filter currFilter;
+    private IFilter currFilter;
+    private FilterBuilder filterBuilder;
     private int index = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public GalleryPresenter(Activity context) {
         this.context = context;
         repository = new PhotoRepository(context);
+        filterBuilder = new FilterBuilder();
         index = 0;
-        currFilter = Filter.FilterBuilder.EMPTY_FILTER;
+        currFilter = new BasicFilter();
         photos = repository.findPhotos(currFilter);
         photos.stream().forEach(x -> Log.i("test", x.getCaption()));
         if (photos.size() > 0) {
@@ -60,12 +65,24 @@ public class GalleryPresenter {
             Photo photo = repository.create();
             // Continue only if the File was successfully created
             if (photo.getPhotoFile() != null) {
-                currFilter = Filter.FilterBuilder.EMPTY_FILTER; // reset filter to empty filter
+                currFilter = new BasicFilter(); // reset filter to empty filter
                 Uri photoURI = FileProvider.getUriForFile(context, "com.example.photo_gallery.fileprovider", photo.getPhotoFile());
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 context.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
+    }
+
+    public IFilter buildFilter(Date filterStartTimestamp, Date filterEndTimestamp, String filterCaption) {
+        Log.i("StarttimeStamp", filterStartTimestamp != null ? filterStartTimestamp.toString() : "");
+        Log.i("EndTimeStamp", filterEndTimestamp != null ? filterEndTimestamp.toString() : "");
+        Log.i("filterCaption", filterCaption != null ? filterCaption : "NULL");
+
+        if (filterStartTimestamp != null || filterEndTimestamp != null)
+            filterBuilder.withDates(filterStartTimestamp, filterEndTimestamp);
+        if (filterCaption != null && filterCaption != "")
+            filterBuilder.withCaption(filterCaption);
+        return filterBuilder.build();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -74,8 +91,7 @@ public class GalleryPresenter {
         File file = new File(Environment.getExternalStorageDirectory()
                 .getAbsolutePath(), "/Android/data/com.example.photo_gallery/files/Pictures");
         File[] fList = file.listFiles();
-        currFilter = new Filter.FilterBuilder(filterStartTimestamp, filterEndTimestamp)
-                .withCaption(filterCaption).build();
+        currFilter = buildFilter(filterStartTimestamp, filterEndTimestamp, filterCaption);
         photos = repository.findPhotos(currFilter);
         Photo photoToDisplay = null;
         if (photos.size() > 0) {
@@ -116,7 +132,6 @@ public class GalleryPresenter {
             case "ScrollPrev":
                 if (index > 0) {
                     index--;
-                    this.displayPhoto();
                 }
                 break;
             case "ScrollNext":
@@ -124,12 +139,12 @@ public class GalleryPresenter {
                 Log.i("photos.size()", String.valueOf(photos.size()));
                 if (index < (photos.size() - 1)) {
                     index++;
-                    this.displayPhoto();
                 }
                 break;
             default:
                 break;
         }
+        this.displayPhoto();
     }
 
     public void displayPhoto() {
