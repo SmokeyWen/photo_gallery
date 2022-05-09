@@ -183,12 +183,11 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_CANCELED) {
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
                 try {
-
-                    IFilter resetFilter = new DateFilter(new BasicFilter(), "", new Date(Long.MIN_VALUE), new Date(), "");
+                    IFilter resetFilter = new DateFilter(new BasicFilter(), new Date(Long.MIN_VALUE), new Date());
                     newFilter = resetFilter;
                 } catch (Exception ex) {
                     Log.i("Exception?", ex.toString());
-                    IFilter newFilterException = new DateFilter(new BasicFilter(), "", null, null, "");
+                    IFilter newFilterException = new DateFilter(new BasicFilter(), null, null);
                     newFilter = newFilterException;
                 }
                 Log.i("intent", String.valueOf(data));
@@ -212,8 +211,7 @@ public class MainActivity extends AppCompatActivity {
                 String keyword = (String) data.getStringExtra("KEYWORDS");
                 DateFormat format = new SimpleDateFormat("yyyy‐MM‐dd HH:mm:ss");
                 try {
-
-                    IFilter filter = new CaptionFilter(new DateFilter(new BasicFilter(), keyword, format.parse(from), format.parse(to), ""));
+                    IFilter filter = new CaptionFilter(new DateFilter(new BasicFilter(), format.parse(from), format.parse(to)), keyword);
                     newFilter = filter;
                 } catch (Exception ex) {
                     Log.i("Exception?", ex.toString());

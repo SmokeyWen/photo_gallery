@@ -23,9 +23,7 @@ public class DateFilter extends FilterDecorator {
     @Override
     public Stream<File> filterPhotos(Stream<File> photos) {
         Stream<File> filterdPhotos = this.getFilter().filterPhotos(photos);
-//        ArrayList<String> photo_res = new ArrayList<String>();
         Stream<File> findFileStream = filterdPhotos.filter(f -> ((filterStartTimeStamp == null && filterEndTimeStamp == null) || (f.lastModified() >= filterEndTimeStamp.getTime() && f.lastModified() <= filterEndTimeStamp.getTime())));
-//        findFileStream.forEach(f -> photo_res.add(f.getPath()));
         return findFileStream;
     }
 }
