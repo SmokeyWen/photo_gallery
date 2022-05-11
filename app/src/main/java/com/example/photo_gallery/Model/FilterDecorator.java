@@ -1,8 +1,8 @@
-package com.example.photo_gallery;
+package com.example.photo_gallery.Model;
+
+import com.example.photo_gallery.Model.IFilter;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.stream.Stream;
 
 public abstract class FilterDecorator implements IFilter {

@@ -1,12 +1,13 @@
-package com.example.photo_gallery;
+package com.example.photo_gallery.Model;
 
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.photo_gallery.Model.FilterDecorator;
+import com.example.photo_gallery.Model.IFilter;
+
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.stream.Stream;
 
 public class LocationFilter extends FilterDecorator {

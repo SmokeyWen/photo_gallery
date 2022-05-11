@@ -1,11 +1,11 @@
-package com.example.photo_gallery;
+package com.example.photo_gallery.Model;
 
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.stream.Stream;
 
@@ -23,7 +23,9 @@ public class DateFilter extends FilterDecorator {
     @Override
     public Stream<File> filterPhotos(Stream<File> photos) {
         Stream<File> filterdPhotos = this.getFilter().filterPhotos(photos);
-        Stream<File> findFileStream = filterdPhotos.filter(f -> ((filterStartTimeStamp == null && filterEndTimeStamp == null) || (f.lastModified() >= filterEndTimeStamp.getTime() && f.lastModified() <= filterEndTimeStamp.getTime())));
+//        ArrayList<String> photo_res = new ArrayList<String>();
+        Stream<File> findFileStream = filterdPhotos.filter(f -> filterStartTimeStamp == null && filterEndTimeStamp == null || f.lastModified() >= filterStartTimeStamp.getTime() && f.lastModified() <= filterEndTimeStamp.getTime());
+//        findFileStream.forEach(f -> photo_res.add(f.getPath()));
         return findFileStream;
     }
 }
