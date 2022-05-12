@@ -11,7 +11,8 @@ import com.example.photo_gallery.MainActivity;
 import com.example.photo_gallery.Model.Photo;
 import com.example.photo_gallery.Model.PhotoRepository;
 
-/** Our old code base had many logs that would
+/** Our old code base had many logs that would separately dictate the same message that photos have been
+ * initiated. This aspect here encaspulates all the logs that are sent out by the different objects
  *  */
 @Aspect
 public class TracingAspect {
