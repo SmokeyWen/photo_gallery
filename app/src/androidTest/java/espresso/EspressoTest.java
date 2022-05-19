@@ -1,5 +1,6 @@
 package espresso;
 
+import static androidx.test.espresso.Espresso.pressBackUnconditionally;
 import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.typeText;
@@ -17,6 +18,7 @@ import androidx.test.espresso.Espresso;
 
 import com.example.photo_gallery.MainActivity;
 
+import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -207,6 +209,12 @@ public class EspressoTest {
         for(int i = 0; i < threeTimes; ++i) {
             onView(withId(R.id.btnPrev)).perform(click());
         }
+    }
+
+    @AfterClass
+    public void tearDown() {
+        pressBackUnconditionally(); //leave the app
+        
     }
 
 }
