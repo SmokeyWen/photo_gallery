@@ -191,4 +191,22 @@ public class EspressoTest {
         pressBack(); //hit back button. back to app mainActivity
     }
 
+    //test the next button. hit it 3 times
+    @Test
+    public void hitNext() {
+        int threeTimes = 3;
+        for(int i = 0; i < threeTimes; ++i) {
+            onView(withId(R.id.btnNext)).perform(click());
+        }
+    }
+
+    //test previous button. hit it 3 times
+    @Test
+    public void hitPrev() {
+        int threeTimes = 3;
+        for(int i = 0; i < threeTimes; ++i) {
+            onView(withId(R.id.btnPrev)).perform(click());
+        }
+    }
+
 }
