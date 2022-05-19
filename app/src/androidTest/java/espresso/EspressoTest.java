@@ -1,5 +1,6 @@
 package espresso;
 
+import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
@@ -183,4 +184,11 @@ public class EspressoTest {
 //      Check the caption on main screen has the correct one
         onView(withId(R.id.etCaption)).check(matches(withText(caption)));
     }
+
+    @Test
+    public void selectSnap() {
+        onView(withId(R.id.snap)).perform(click()); //click on "Snap" button
+        pressBack(); //hit back button. back to app mainActivity
+    }
+
 }
