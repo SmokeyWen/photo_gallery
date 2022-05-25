@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.ibotta.gradle.aop'
 }
 
 android {
@@ -38,4 +39,19 @@ dependencies {
 
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
+
+    implementation "org.aspectj:aspectjrt:1.9.6"
+
+    // https://mvnrepository.com/artifact/aspectj.gradle/aspectj.gradle.gradle.plugin
+    //implementation group: 'aspectj.gradle', name: 'aspectj.gradle.gradle.plugin', version: '0.1.6', ext: 'pom'
+
+    // https://mvnrepository.com/artifact/org.aspectj/aspectjweaver
+    //runtimeOnly group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.9.1'
 }
+
+// This block is optional, but recommended. The "filter" will be used to limit the scope of classes
+// that AspectJ will look at. For performance reasons, and to avoid accidentally picking up AspectJ
+// annotations from other libraries, specify a filter which will target only your code.
+//aopWeave {
+//    filter = "com/example/myapp"
+//}
