@@ -1,5 +1,7 @@
 package espresso;
 
+import static androidx.test.espresso.Espresso.pressBackUnconditionally;
+import static androidx.test.espresso.action.ViewActions.pressBack;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
@@ -16,6 +18,7 @@ import androidx.test.espresso.Espresso;
 
 import com.example.photo_gallery.MainActivity;
 
+import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -183,4 +186,35 @@ public class EspressoTest {
 //      Check the caption on main screen has the correct one
         onView(withId(R.id.etCaption)).check(matches(withText(caption)));
     }
+
+    @Test
+    public void selectSnap() {
+        onView(withId(R.id.snap)).perform(click()); //click on "Snap" button
+        pressBack(); //hit back button. back to app mainActivity
+    }
+
+    //test the next button. hit it 3 times
+    @Test
+    public void hitNext() {
+        int threeTimes = 3;
+        for(int i = 0; i < threeTimes; ++i) {
+            onView(withId(R.id.btnNext)).perform(click());
+        }
+    }
+
+    //test previous button. hit it 3 times
+    @Test
+    public void hitPrev() {
+        int threeTimes = 3;
+        for(int i = 0; i < threeTimes; ++i) {
+            onView(withId(R.id.btnPrev)).perform(click());
+        }
+    }
+
+    @AfterClass
+    public void tearDown() {
+        pressBackUnconditionally(); //leave the app
+        
+    }
+
 }
