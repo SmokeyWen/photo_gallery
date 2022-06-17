@@ -30,7 +30,7 @@ jobs:
     - run: ./gradlew lint
     - uses: yutailang0119/action-android-lint@v3
       with:
-        report-path: '${{github.workspace}}/app/build/reports/*.xml' # Support glob patterns by https://www.npmjs.com/package/@actions/glob
+        report-path: https://github.com/SmokeyWen/photo_gallery.git/app/build/reports/*.xml # Support glob patterns by https://www.npmjs.com/package/@actions/glob
         continue-on-error: false # If annotations contain error of severity, action-android-lint exit 1.
 
     
