@@ -22,6 +22,29 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      
-    - name: Build with Gradle
-      run: ./gradlew build
+    
+    - name: Gradle Build Action
+      uses: gradle/gradle-build-action@v2.2.0
+
+    #- name: Checkout code base
+    #  uses: actions/checkout@v3
+    #  with:
+        # Full git history is needed to get a proper list of changed files within `super-linter`
+    #    fetch-depth: 0
+
+    # Super Linter Action below, missing following packages when running: jscpd, yamllint and express package 'yq' 
+    #- name: install dependencies jscpd
+    #  run: npm install -g jscpd
+
+    #- name: install dependencies yaml-lint
+    #  run: npm install --save-dev yaml-lint
+
+    #- name: install dependencies yq
+    #  run: npm install yq
+
+    #- name: Lint check the code base
+    #  uses: github/super-linter@v4
+    #  env:
+    #    VALIDATE_ALL_CODEBASE: false
+    #    DEFAULT_BRANCH: "main"
+    #    GITHUB_TOKEN: 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
