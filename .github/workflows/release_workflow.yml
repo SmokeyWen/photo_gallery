@@ -3,7 +3,7 @@ name: Debug build upon merge
 #When we are merging to stage branch (develop)
 on:
   pull_request:
-    branches: [ "stage" ]
+    branches: [ "main" ]
 
 jobs:
   build:
