@@ -50,4 +50,4 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
-          GITHUB_TOKEN: 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
+          GITHUB_TOKEN: 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
