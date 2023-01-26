@@ -22,7 +22,10 @@
         android:layout_marginEnd="32dp"
         android:ems="10"
         android:inputType="date"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:focusableInTouchMode="true"
+        android:cursorVisible="false"
+        android:focusable="false"/>
 
     <TextView
         android:id="@+id/tvToDateTime"  android:text="To: "
@@ -39,7 +42,10 @@
         android:layout_marginEnd="31dp"
         android:ems="10"
         android:inputType="date"
-        android:textSize="24sp" />
+        android:textSize="24sp"
+        android:focusableInTouchMode="true"
+        android:cursorVisible="false"
+        android:focusable="false"/>
     <TextView
         android:id="@+id/tvKeywords" android:text="Keywords: "
         android:layout_width="wrap_content" android:layout_height="wrap_content"

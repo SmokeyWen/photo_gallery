@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.photo_gallery" >
+    package="com.example.photo_gallery">
 
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+        android:maxSdkVersion="28" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -28,6 +28,10 @@
         <intent>
             <action android:name="android.intent.action.GET_CONTENT" />
         </intent>
+        <intent>
+            <action
+                android:name="android.speech.RecognitionService" />
+        </intent>
     </queries>
 
     <application
@@ -39,7 +43,7 @@
         android:theme="@style/Theme.Photo_gallery" >
         <activity
             android:name=".SearchActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true" >
